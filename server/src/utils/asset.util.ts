@@ -12,6 +12,7 @@ import { EventRepository } from 'src/repositories/event.repository';
 import { PartnerRepository } from 'src/repositories/partner.repository';
 import { IBulkAsset, ImmichFile, UploadFile, UploadRequest } from 'src/types';
 import { checkAccess } from 'src/utils/access';
+import { setDifference, setUnion } from 'src/utils/set';
 
 export const getAssetFile = (files: AssetFile[], type: AssetFileType, { isEdited }: { isEdited: boolean }) => {
   return files.find((file) => file.type === type && file.isEdited === isEdited);
@@ -33,16 +34,22 @@ export const getAssetFiles = (files: AssetFile[]) => ({
 export const addAssets = async (
   auth: AuthDto,
   repositories: { access: AccessRepository; bulk: IBulkAsset },
-  dto: { parentId: string; assetIds: string[] },
+  dto: { parentId: string; assetIds: string[]; allowSharedAlbumAssets?: boolean },
 ) => {
   const { access, bulk } = repositories;
   const existingAssetIds = await bulk.getAssetIds(dto.parentId, dto.assetIds);
   const notPresentAssetIds = dto.assetIds.filter((id) => !existingAssetIds.has(id));
-  const allowedAssetIds = await checkAccess(access, {
+  let allowedAssetIds = await checkAccess(access, {
     auth,
     permission: Permission.AssetShare,
     ids: notPresentAssetIds,
   });
+  if (dto.allowSharedAlbumAssets && !auth.sharedLink) {
+    allowedAssetIds = setUnion(
+      allowedAssetIds,
+      await access.asset.checkAlbumAccess(auth.user.id, setDifference(new Set(notPresentAssetIds), allowedAssetIds)),
+    );
+  }
 
   const results: BulkIdResponseDto[] = [];
   for (const assetId of dto.assetIds) {

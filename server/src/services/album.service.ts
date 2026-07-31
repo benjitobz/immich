@@ -20,6 +20,7 @@ import { BaseService } from 'src/services/base.service';
 import { addAssets, removeAssets } from 'src/utils/asset.util';
 import { asDateTimeString } from 'src/utils/date';
 import { getPreferences } from 'src/utils/preferences';
+import { setDifference, setUnion } from 'src/utils/set';
 
 @Injectable()
 export class AlbumService extends BaseService {
@@ -108,11 +109,7 @@ export class AlbumService extends BaseService {
       }
     }
 
-    const allowedAssetIdsSet = await this.checkAccess({
-      auth,
-      permission: Permission.AssetShare,
-      ids: dto.assetIds || [],
-    });
+    const allowedAssetIdsSet = await this.getAddableAssetIds(auth, dto.assetIds || []);
     const assetIds = [...allowedAssetIdsSet].map((id) => id);
 
     const userMetadata = await this.userRepository.getMetadata(auth.user.id);
@@ -175,7 +172,7 @@ export class AlbumService extends BaseService {
     const results = await addAssets(
       auth,
       { access: this.accessRepository, bulk: this.albumRepository },
-      { parentId: id, assetIds: dto.ids },
+      { parentId: id, assetIds: dto.ids, allowSharedAlbumAssets: true },
     );
 
     const { id: firstNewAssetId } = results.find(({ success }) => success) || {};
@@ -214,7 +211,7 @@ export class AlbumService extends BaseService {
       return results;
     }
 
-    const allowedAssetIds = await this.checkAccess({ auth, permission: Permission.AssetShare, ids: dto.assetIds });
+    const allowedAssetIds = await this.getAddableAssetIds(auth, dto.assetIds);
     if (allowedAssetIds.size === 0) {
       results.error = BulkIdErrorReason.NO_PERMISSION;
       return results;
@@ -357,5 +354,18 @@ export class AlbumService extends BaseService {
       throw new BadRequestException('Album not found');
     }
     return album;
+  }
+
+  private async getAddableAssetIds(auth: AuthDto, ids: string[]): Promise<Set<string>> {
+    const allowed = await this.checkAccess({ auth, permission: Permission.AssetShare, ids });
+    if (auth.sharedLink) {
+      return allowed;
+    }
+
+    const viaSharedAlbum = await this.accessRepository.asset.checkAlbumAccess(
+      auth.user.id,
+      setDifference(new Set(ids), allowed),
+    );
+    return setUnion(allowed, viaSharedAlbum);
   }
 }
