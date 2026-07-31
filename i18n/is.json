@@ -982,5 +982,7 @@
   "info": "Upplýsingar",
   "interval": {
     "day_at_onepm": "Alla daga klukkan 13"
-  }
+  },
+  "let_members_save_to_own_albums": "Leyfa meðlimum að bæta myndum úr þessu albúmi í eigin albúm",
+  "save_to_own_albums": "Vista í eigin albúm"
 }

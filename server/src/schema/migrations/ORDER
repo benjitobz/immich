@@ -86,6 +86,7 @@
 1782500000000-RestoreLivePhotoStillVisibility
 1784647658615-AddOAuthBearerTokenToSession
 1784836013770-MinFacePreferenceMigration
+1784836013771-AddAlbumAssetReuse
 1784986754473-ConvertUserPasswordEmptyStringToNull
 1784986754474-AlbumDescriptionNullable
 1786385711807-AlbumOwnerDeleteTrigger

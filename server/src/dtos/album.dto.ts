@@ -90,6 +90,7 @@ const UpdateAlbumSchema = z
       }),
     albumThumbnailAssetId: z.uuidv4().optional().describe('Album thumbnail asset ID'),
     isActivityEnabled: z.boolean().optional().describe('Enable activity feed'),
+    isAssetReuseEnabled: z.boolean().optional().describe('Allow members to add album assets to their own albums'),
     order: AssetOrderSchema.optional(),
   })
   .meta({ id: 'UpdateAlbumDto' });
@@ -185,6 +186,7 @@ export const AlbumResponseSchema = z
       .optional()
       .describe('UTC representation of (local) end date (latest asset)'),
     isActivityEnabled: z.boolean().describe('Activity feed enabled'),
+    isAssetReuseEnabled: z.boolean().describe('Members may add album assets to their own albums'),
     order: AssetOrderSchema.optional(),
     contributorCounts: z.array(ContributorCountResponseSchema).optional(),
   })
@@ -226,6 +228,7 @@ export type MapAlbumDto = {
   updatedAt: Date;
   id: string;
   isActivityEnabled: boolean;
+  isAssetReuseEnabled: boolean;
   order: AssetOrder;
 };
 
@@ -269,6 +272,7 @@ export const mapAlbum = (entity: MaybeDehydrated<MapAlbumDto>): AlbumResponseDto
     endDate: asDateTimeString(endDate),
     assetCount: entity.assets?.length || 0,
     isActivityEnabled: entity.isActivityEnabled,
+    isAssetReuseEnabled: entity.isAssetReuseEnabled,
     order: entity.order,
   };
 };

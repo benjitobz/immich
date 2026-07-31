@@ -97,6 +97,12 @@
               onCheckedChange={(checked) => handleUpdateAlbum(album, { isActivityEnabled: checked })}
             />
           </Field>
+          <Field label={$t('save_to_own_albums')} description={$t('let_members_save_to_own_albums')} disabled={readOnly}>
+            <Switch
+              checked={album.isAssetReuseEnabled}
+              onCheckedChange={(checked) => handleUpdateAlbum(album, { isAssetReuseEnabled: checked })}
+            />
+          </Field>
         </div>
       </div>
 

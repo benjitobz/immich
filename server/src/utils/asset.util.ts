@@ -47,7 +47,10 @@ export const addAssets = async (
   if (dto.allowSharedAlbumAssets && !auth.sharedLink) {
     allowedAssetIds = setUnion(
       allowedAssetIds,
-      await access.asset.checkAlbumAccess(auth.user.id, setDifference(new Set(notPresentAssetIds), allowedAssetIds)),
+      await access.asset.checkAlbumAssetReuseAccess(
+        auth.user.id,
+        setDifference(new Set(notPresentAssetIds), allowedAssetIds),
+      ),
     );
   }
 

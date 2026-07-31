@@ -876,6 +876,8 @@ export type AlbumResponseDto = {
     id: string;
     /** Activity feed enabled */
     isActivityEnabled: boolean;
+    /** Members may add album assets to their own albums */
+    isAssetReuseEnabled: boolean;
     /** Last modified asset timestamp */
     lastModifiedAssetTimestamp?: string;
     order?: AssetOrder;
@@ -929,6 +931,8 @@ export type UpdateAlbumDto = {
     description?: string | null;
     /** Enable activity feed */
     isActivityEnabled?: boolean;
+    /** Allow members to add album assets to their own albums */
+    isAssetReuseEnabled?: boolean;
     order?: AssetOrder;
 };
 export type BulkIdsDto = {
