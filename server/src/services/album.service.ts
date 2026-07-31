@@ -152,6 +152,7 @@ export class AlbumService extends BaseService {
         description: dto.description,
         albumThumbnailAssetId: dto.albumThumbnailAssetId,
         isActivityEnabled: dto.isActivityEnabled,
+        isAssetReuseEnabled: dto.isAssetReuseEnabled,
         order: dto.order,
       },
       auth.user.id,
@@ -362,7 +363,7 @@ export class AlbumService extends BaseService {
       return allowed;
     }
 
-    const viaSharedAlbum = await this.accessRepository.asset.checkAlbumAccess(
+    const viaSharedAlbum = await this.accessRepository.asset.checkAlbumAssetReuseAccess(
       auth.user.id,
       setDifference(new Set(ids), allowed),
     );
